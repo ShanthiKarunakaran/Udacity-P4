@@ -451,18 +451,16 @@ var resizePizzas = function(size) {
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
 
-    //Optimized: Caching the randomPizzaContainer length calculation and avoiding querySelectorAll which is the slowest method to access DOM elements
-    var len = document.getElementsByClassName("randomPizzaContainer").length;
-
-    //Optimized : dx and newwidth is the same for all the pizzas so there is no reason to keep it inside the loop.
-    //Optimized : Avoided using querySelectorAll which is the slowest method to access DOM elements
-    var dx = determineDx(document.getElementsByClassName("randomPizzaContainer")[0], size);
-
-    //Optimized : Avoided using querySelectorAll which is the slowest method to access DOM elements
-    var newwidth = (document.getElementsByClassName("randomPizzaContainer")[0].offsetWidth + dx) + 'px';
+    //Optimized: Caching the randomPizzaContainer length calculation
+    //dx and newwidth is the same for all the pizzas so there is no reason to keep it inside the loop.
+    //Avoided using querySelectorAll which is the slowest method to access DOM elements
+    var container = document.getElementsByClassName("randomPizzaContainer"),
+        len = container.length,
+        dx = determineDx(container[0], size),
+        newwidth = (container[0].offsetWidth + dx) + 'px';
 
     for (var i = 0; i < len; i++) {
-      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+      container[i].style.width = newwidth;
     }
   }
 
@@ -537,6 +535,7 @@ function updatePositions() {
     //of the need to retrigger a layout
     var itemsLeft = items[i].basicLeft + phases[(i % 5)] + 'px';
     items[i].style.webkitTransform = "translateX(" + itemsLeft + ")";
+    items[i].style.transform = "translateX(" + itemsLeft + ")";
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -564,7 +563,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   for (var i = 0; i < numberOfPizzas; i++) {
     var elem = document.createElement('img'),
-        elemTop = (Math.floor(i / cols) * s) + 'px';
+    elemTop = (Math.floor(i / cols) * s) + 'px';
 
     elem.className = 'mover';
     elem.src = "images/pizza.png";
@@ -577,7 +576,9 @@ document.addEventListener('DOMContentLoaded', function() {
     elem.style.left = elem.basicLeft + "px";
     elem.style.top = elemTop;
     //elem.style.webkitTransform = "translateY(" + elemTop + ")";
-    document.querySelector("#movingPizzas1").appendChild(elem);
+    //Optimized : instead of querying id using queryselector
+    var movingPizzas = document.getElementById("movingPizzas1");
+    movingPizzas.appendChild(elem);
   }
   updatePositions();
 });
